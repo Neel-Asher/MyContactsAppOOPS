@@ -1,7 +1,7 @@
 # MyContactsAppOOPS
 MyContacts App is a Java-based, console-driven application implemented use-case wise to demonstrate object-oriented design, design patterns, and core Java concepts through a contact management system.
 
-## UC-03: Profile Management – MyContactsApp
+## UC-03: Profile Management – 26.02.2026
 
 + Allows a logged-in user to update profile details and manage account settings.
 + Users can update first name and last name with validation inside the User class.
