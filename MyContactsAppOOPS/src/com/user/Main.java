@@ -10,7 +10,7 @@ package com.user;
  * The Main class handles console input, validation, object creation, and displays the registration result.
  * 
  * @author Neel Asher
- * @version 3.0
+ * @version 4.0
  */
 import java.util.Optional;
 import java.util.Scanner;
@@ -24,6 +24,7 @@ import com.user.model.User;
 import com.user.repository.UserRepository;
 import com.user.session.SessionManager;
 import com.user.Validation.Validator;
+import com.user.contact.*;
 
 public class Main {
 
@@ -112,7 +113,8 @@ public class Main {
                 System.out.println("\n1. Update Name");
                 System.out.println("2. Change Password");
                 System.out.println("3. Change Preferences");
-                System.out.println("4. Logout");
+                System.out.println("4. Add Contact");
+                System.out.println("5. Logout");
                 System.out.print("Choose option: ");
                 int choice = Integer.parseInt(sc.nextLine());
 
@@ -155,6 +157,47 @@ public class Main {
                         System.out.println("Preferences updated successfully!");
                     
                 	} else if (choice == 4) {
+
+                	    System.out.print("Enter contact type (person/organization): ");
+                	    String type = sc.nextLine().toLowerCase();
+
+                	    System.out.print("Enter contact name: ");
+                	    String name = sc.nextLine();
+
+                	    Contact contact;
+
+                	    if (type.equals("person")) {
+                	        contact = new Person(name);
+                	    } else if (type.equals("organization")) {
+                	        contact = new Organization(name);
+                	    } else {
+                	        System.out.println("Invalid contact type.");
+                	        continue;
+                	    }
+
+                	    System.out.print("How many phone numbers? ");
+                	    int phoneCount = Integer.parseInt(sc.nextLine());
+
+                	    for (int i = 0; i < phoneCount; i++) {
+                	        System.out.print("Enter phone number: ");
+                	        contact.addPhoneNumber(new PhoneNumber(sc.nextLine()));
+                	    }
+
+                	    System.out.print("How many email addresses? ");
+                	    int emailCount = Integer.parseInt(sc.nextLine());
+
+                	    for (int i = 0; i < emailCount; i++) {
+                	        System.out.print("Enter email address: ");
+                	        contact.addEmailAddress(new EmailAddress(sc.nextLine()));
+                	    }
+
+                	    session.getCurrentUser()
+                	           .getContactRepository()
+                	           .addContact(contact);
+
+                	    System.out.println("Contact added successfully!");
+                    
+                    } else if (choice == 5) {
 
                         session.logout();
                         System.out.println("Logged out successfully.");
