@@ -1,7 +1,7 @@
 # MyContactsAppOOPS
 MyContacts App is a Java-based, console-driven application implemented use-case wise to demonstrate object-oriented design, design patterns, and core Java concepts through a contact management system.
 
-## UC-01: User Registration – MyContactsApp
+## UC-01: User Registration – 26.02.2026
 
 + Allows new users to register with email, password, first name, and last name.
 + Implements an abstract User class for common user attributes.
