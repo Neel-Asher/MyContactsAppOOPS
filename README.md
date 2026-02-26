@@ -1,0 +1,2 @@
+# MyContactsAppOOPS
+MyContacts App is a Java-based, console-driven application implemented use-case wise to demonstrate object-oriented design, design patterns, and core Java concepts through a contact management system.
