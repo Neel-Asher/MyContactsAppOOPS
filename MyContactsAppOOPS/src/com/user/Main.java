@@ -10,11 +10,12 @@ package com.user;
  * The Main class handles console input, validation, object creation, and displays the registration result.
  * 
  * @author Neel Asher
- * @version 6.0
+ * @version 7.0
  */
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.ArrayList;
 import com.user.auth.Authentication;
 import com.user.auth.BasicAuth;
@@ -118,7 +119,8 @@ public class Main {
                 System.out.println("4. Add Contact");
                 System.out.println("5. View Contact Details");
                 System.out.println("6. Edit Contact");
-                System.out.println("7. Logout");
+                System.out.println("7. Delete Contact");
+                System.out.println("8. Logout");
                 System.out.print("Choose option: ");
                 int choice = Integer.parseInt(sc.nextLine());
 
@@ -347,9 +349,51 @@ public class Main {
 
                         repo.update(edited);
                         System.out.println("Contact updated successfully!");
+                    
+                    // delete contact option
+                    } else if (choice == 7) {
+                    	ContactRepository repo = session.getCurrentUser().getContactRepository();
+                        List<Contact> contacts = repo.findAll();
+
+                        if (contacts.isEmpty()) {
+                            System.out.println("No contacts available to delete.");
+                            return;
+                        }
+
+                        System.out.println("\n--- Your Contacts ---");
+                        for (int i = 0; i < contacts.size(); i++) {
+                            Contact c = contacts.get(i);
+                            System.out.println((i + 1) + ". " + c.getName() + " (" + c.getContactType() + ")");
+                        }
+
+                        System.out.print("Select contact number to delete: ");
+                        int index = Integer.parseInt(sc.nextLine());
+
+                        if (index < 1 || index > contacts.size()) {
+                            System.out.println("Invalid selection.");
+                            return;
+                        }
+
+                        Contact selected = contacts.get(index - 1);
+
+                        System.out.print("Are you sure you want to delete '" 
+                                + selected.getName() + "'? (yes/no): ");
+
+                        String confirmation = sc.nextLine();
+
+                        if (confirmation.equalsIgnoreCase("yes")) {
+                            try {
+                                repo.delete(selected.getId());
+                                System.out.println("Contact deleted successfully!");
+                            } catch (NoSuchElementException e) {
+                                System.out.println("Error: " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("Deletion cancelled.");
+                        }
                         
                     // logout option
-                    } else if (choice == 7) {
+                    } else if (choice == 8) {
 
                         session.logout();
                         System.out.println("Logged out successfully.");
