@@ -31,4 +31,12 @@ public class ContactRepository {
     	}
     	contactStore.remove(id);
     }
+    
+    public void deleteAll(List<UUID> ids) {
+    	ids.forEach(contactStore::remove);
+    }
+    
+    public List<Contact> filter(java.util.function.Predicate<Contact> predicate) {
+    	return contactStore.values().stream().filter(predicate).toList();
+    }
 }
