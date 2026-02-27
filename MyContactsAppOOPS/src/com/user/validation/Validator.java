@@ -1,4 +1,4 @@
-package com.user.Validation;
+package com.user.validation;
 
 // validator class for validating all registration fields
 import java.util.regex.Pattern;
