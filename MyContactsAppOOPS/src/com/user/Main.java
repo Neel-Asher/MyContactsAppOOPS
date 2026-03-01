@@ -24,15 +24,12 @@ import com.user.auth.Authentication;
 import com.user.auth.BasicAuth;
 import com.user.encryption.PasswordHashing;
 import com.user.exception.InvalidUserDataException;
+import com.user.filter.*;
 import com.user.model.FreeUser;
 import com.user.model.PremiumUser;
 import com.user.model.User;
 import com.user.repository.UserRepository;
-import com.user.search.ContactSearch;
-import com.user.search.SearchByEmail;
-import com.user.search.SearchByName;
-import com.user.search.SearchByPhone;
-import com.user.search.SearchByTag;
+import com.user.search.*;
 import com.user.session.SessionManager;
 import com.user.validation.Validator;
 import com.user.contact.*;
@@ -130,7 +127,8 @@ public class Main {
                 System.out.println("7. Delete Contact");
                 System.out.println("8. Bulk Operations");
                 System.out.println("9. Search Contacts");
-                System.out.println("10. Logout");
+                System.out.println("10. Advanced Filtering");
+                System.out.println("11. Logout");
                 System.out.print("Choose option: ");
                 int choice = Integer.parseInt(sc.nextLine());
 
@@ -536,8 +534,52 @@ public class Main {
                                 }
                             }
                         }
-                    // logout option
+                        
                     } else if (choice == 10) {
+
+                        ContactRepository repo = session.getCurrentUser().getContactRepository();
+                        List<Contact> contacts = repo.findAll();
+
+                        if (contacts.isEmpty()) {
+                            System.out.println("No contacts available.");
+                            return;
+                        }
+
+                        CompositeFilter composite = new CompositeFilter();
+
+                        System.out.print("Filter by tag? (yes/no): ");
+                        if (sc.nextLine().equalsIgnoreCase("yes")) {
+                            System.out.print("Enter tag: ");
+                            composite.addFilter(new TagFilter(sc.nextLine()));
+                        }
+
+                        System.out.print("Filter by date added? (yes/no): ");
+                        if (sc.nextLine().equalsIgnoreCase("yes")) {
+                            System.out.print("Enter days ago (e.g. 7): ");
+                            int days = Integer.parseInt(sc.nextLine());
+                            composite.addFilter(new DateFilter(
+                                    java.time.LocalDateTime.now().minusDays(days)
+                            ));
+                        }
+
+                        System.out.print("Filter by frequently contacted? (yes/no): ");
+                        if (sc.nextLine().equalsIgnoreCase("yes")) {
+                            System.out.print("Minimum contact count: ");
+                            int count = Integer.parseInt(sc.nextLine());
+                            composite.addFilter(new FrequentContactFilter(count));
+                        }
+
+                        List<Contact> filtered = contacts.stream()
+                                .filter(composite::apply)
+                                .toList();
+
+                        if (filtered.isEmpty()) {
+                            System.out.println("No contacts match the filters.");
+                        } else {
+                            filtered.forEach(System.out::println);
+                        }
+                    // logout option
+                    } else if (choice == 11) {
 
                         session.logout();
                         System.out.println("Logged out successfully.");

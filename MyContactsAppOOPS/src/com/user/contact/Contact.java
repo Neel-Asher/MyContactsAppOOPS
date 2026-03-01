@@ -14,6 +14,7 @@ public abstract class Contact {
     private final List<PhoneNumber> phoneNumbers;
     private final List<EmailAddress> emailAddresses;
     private final List<String> tags; 
+    private int contactCount = 0;	
 
     public Contact(String name) {
         this.id = UUID.randomUUID();
@@ -93,6 +94,14 @@ public abstract class Contact {
 
     public List<String> getTags() {
         return new ArrayList<>(tags); // defensive copy
+    }
+    
+    public void incrementContactCount() {
+        contactCount++;
+    }
+
+    public int getContactCount() {
+        return contactCount;
     }
 
     public abstract String getContactType();
