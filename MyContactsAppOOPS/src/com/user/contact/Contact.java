@@ -13,6 +13,7 @@ public abstract class Contact {
     private String name;
     private final List<PhoneNumber> phoneNumbers;
     private final List<EmailAddress> emailAddresses;
+    private final List<String> tags; 
 
     public Contact(String name) {
         this.id = UUID.randomUUID();
@@ -20,6 +21,7 @@ public abstract class Contact {
         this.name = name;
         this.phoneNumbers = new ArrayList<>();
         this.emailAddresses = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
     
     protected Contact(Contact other) {
@@ -30,6 +32,7 @@ public abstract class Contact {
         // Deep copy
         this.phoneNumbers = new ArrayList<>(other.phoneNumbers);
         this.emailAddresses = new ArrayList<>(other.emailAddresses);
+        this.tags = new ArrayList<>(other.tags);
     }
 
     public UUID getId() {
@@ -76,6 +79,21 @@ public abstract class Contact {
         this.emailAddresses.clear();
         this.emailAddresses.addAll(emails);
     }
+    
+    public void addTag(String tag) {
+        if (tag == null || tag.isBlank()) {
+            throw new IllegalArgumentException("Tag cannot be empty");
+        }
+        tags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+
+    public List<String> getTags() {
+        return new ArrayList<>(tags); // defensive copy
+    }
 
     public abstract String getContactType();
 
@@ -90,13 +108,8 @@ public abstract class Contact {
                 Phone Numbers: %s
                 Email Addresses: %s
                 Created At: %s
+                Tags: %s
                 ==============================
-                """.formatted(
-                getContactType(),
-                name,
-                phoneNumbers,
-                emailAddresses,
-                createdAt
-        );
+                """.formatted(getContactType(),name,phoneNumbers,emailAddresses,createdAt,tags);
     }
 }

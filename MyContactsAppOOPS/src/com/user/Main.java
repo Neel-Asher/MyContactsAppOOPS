@@ -28,6 +28,11 @@ import com.user.model.FreeUser;
 import com.user.model.PremiumUser;
 import com.user.model.User;
 import com.user.repository.UserRepository;
+import com.user.search.ContactSearch;
+import com.user.search.SearchByEmail;
+import com.user.search.SearchByName;
+import com.user.search.SearchByPhone;
+import com.user.search.SearchByTag;
 import com.user.session.SessionManager;
 import com.user.validation.Validator;
 import com.user.contact.*;
@@ -124,7 +129,8 @@ public class Main {
                 System.out.println("6. Edit Contact");
                 System.out.println("7. Delete Contact");
                 System.out.println("8. Bulk Operations");
-                System.out.println("9. Logout");
+                System.out.println("9. Search Contacts");
+                System.out.println("10. Logout");
                 System.out.print("Choose option: ");
                 int choice = Integer.parseInt(sc.nextLine());
 
@@ -204,6 +210,14 @@ public class Main {
                             System.out.print("Enter email address: ");
                             contact.addEmailAddress(new EmailAddress(sc.nextLine()));
                         }
+                        
+                        System.out.print("How many tags? ");
+                        int tagCount = Integer.parseInt(sc.nextLine());
+
+                        for (int i = 0; i < tagCount; i++) {
+                            System.out.print("Enter tag: ");
+                            contact.addTag(sc.nextLine());
+                        }
 
                         session.getCurrentUser()
                                .getContactRepository()
@@ -251,6 +265,8 @@ public class Main {
                                 .stream()
                                 .map(EmailAddress::getEmail)
                                 .toList();
+                        
+                        List<String> tags = c.getTags();
 
                         ContactView view = new ContactView(
                                 c.getId(),
@@ -258,7 +274,8 @@ public class Main {
                                 c.getName(),
                                 c.getCreatedAt(),
                                 phones,
-                                emails
+                                emails,
+                                tags
                         );
 
                         System.out.println("\nContact Details:");
@@ -416,6 +433,7 @@ public class Main {
                         System.out.println("1. Delete Multiple Contacts");
                         System.out.println("2. Delete All Persons");
                         System.out.println("3. Delete All Organizations");
+                        System.out.println("4. Delete By Tag");
 
                         int bulkChoice = Integer.parseInt(sc.nextLine());
 
@@ -454,11 +472,72 @@ public class Main {
                                 repo.deleteAll(ids);
                                 System.out.println("All Organization contacts deleted.");
                             }
+                            
+                            case 4 -> {
+                                System.out.print("Enter tag to delete: ");
+                                String tagKeyword = sc.nextLine();
+
+                                List<UUID> ids = repo.filter(c ->
+                                        c.getTags().stream()
+                                         .anyMatch(tag -> tag.equalsIgnoreCase(tagKeyword))
+                                )
+                                .stream()
+                                .map(Contact::getId)
+                                .toList();
+
+                                repo.deleteAll(ids);
+                                System.out.println("Contacts with tag '" + tagKeyword + "' deleted.");
+                            }
 
                             default -> System.out.println("Invalid bulk option.");
                         }
-                    // logout option
+                        
                     } else if (choice == 9) {
+
+                        ContactRepository repo = session.getCurrentUser().getContactRepository();
+                        List<Contact> contacts = repo.findAll();
+
+                        if (contacts.isEmpty()) {
+                            System.out.println("No contacts available.");
+                            return;
+                        }
+
+                        System.out.println("\nSearch By:");
+                        System.out.println("1. Name");
+                        System.out.println("2. Phone");
+                        System.out.println("3. Email");
+                        System.out.println("4. Tag");
+
+                        int searchChoice = Integer.parseInt(sc.nextLine());
+
+                        System.out.print("Enter search keyword: ");
+                        String keyword = sc.nextLine();
+
+                        ContactSearch strategy = null;
+
+                        switch (searchChoice) {
+                            case 1 -> strategy = new SearchByName();
+                            case 2 -> strategy = new SearchByPhone();
+                            case 3 -> strategy = new SearchByEmail();
+                            case 4 -> strategy = new SearchByTag();
+                            default -> System.out.println("Invalid option.");
+                        }
+
+                        if (strategy != null) {
+
+                            List<Contact> results = strategy.search(contacts, keyword);
+
+                            if (results.isEmpty()) {
+                                System.out.println("No matching contacts found.");
+                            } else {
+                                System.out.println("\nSearch Results:");
+                                for (Contact c : results) {
+                                    System.out.println(c);
+                                }
+                            }
+                        }
+                    // logout option
+                    } else if (choice == 10) {
 
                         session.logout();
                         System.out.println("Logged out successfully.");
