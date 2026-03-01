@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import com.user.tag.Tag;
+import com.user.tag.ContactTag;
 import com.user.tag.PredefinedTag;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
@@ -18,7 +20,7 @@ public abstract class Contact {
     private String name;
     private final List<PhoneNumber> phoneNumbers;
     private final List<EmailAddress> emailAddresses;
-    private final Set<Tag> tags;
+    private final Set<ContactTag> contactTags;
     private final Set<PredefinedTag> predefinedTags;
     private int contactCount = 0;	
 
@@ -28,7 +30,7 @@ public abstract class Contact {
         this.name = name;
         this.phoneNumbers = new ArrayList<>();
         this.emailAddresses = new ArrayList<>();
-        this.tags = new HashSet<>();
+        this.contactTags = new HashSet<>();
         this.predefinedTags = new HashSet<>();
     }
     
@@ -40,7 +42,7 @@ public abstract class Contact {
         // Deep copy
         this.phoneNumbers = new ArrayList<>(other.phoneNumbers);
         this.emailAddresses = new ArrayList<>(other.emailAddresses);
-        this.tags = new HashSet<>(other.tags);
+        this.contactTags = new HashSet<>(other.contactTags);
         this.predefinedTags = EnumSet.copyOf(other.predefinedTags);
     }
 
@@ -90,16 +92,26 @@ public abstract class Contact {
     }
     
     // Custom Tags
-    public void addTag(Tag tag) {
-        tags.add(tag);
+    public void assignTag(Tag tag) {
+        ContactTag association = new ContactTag(this, tag);
+
+        if (contactTags.add(association)) {
+            tag.addContact(this);
+        }
     }
 
     public void removeTag(Tag tag) {
-        tags.remove(tag);
+        ContactTag association = new ContactTag(this, tag);
+
+        if (contactTags.remove(association)) {
+            tag.removeContact(this);
+        }
     }
 
     public Set<Tag> getTags() {
-        return new HashSet<>(tags);
+        return contactTags.stream()
+                .map(ContactTag::getTag)
+                .collect(Collectors.toSet());
     }
 
     // Predefined Tags
@@ -139,6 +151,6 @@ public abstract class Contact {
                 Tags: %s
                 Predefined Tags: %s
                 ==============================
-                """.formatted(getContactType(),name,phoneNumbers,emailAddresses,createdAt,tags,predefinedTags);
+                """.formatted(getContactType(),name,phoneNumbers,emailAddresses,createdAt,contactTags,predefinedTags);
     }
 }

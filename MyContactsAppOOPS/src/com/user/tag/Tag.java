@@ -1,11 +1,28 @@
 package com.user.tag;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+
+import com.user.contact.Contact;
 
 // Represents a custom tag for organizing contacts
 public class Tag {
 
     private final String name;
+    private final Set<Contact> contacts = new HashSet<>();
+
+    public void addContact(Contact contact) {
+        contacts.add(contact);
+    }
+
+    public void removeContact(Contact contact) {
+        contacts.remove(contact);
+    }
+
+    public Set<Contact> getContacts() {
+        return new HashSet<>(contacts);
+    }
 
     public Tag(String name) {
         if (name == null || name.isBlank()) {
