@@ -1,9 +1,14 @@
 package com.user.contact;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import com.user.tag.Tag;
+import com.user.tag.PredefinedTag;
 import java.util.List;
 import java.util.UUID;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 // contact class for blueprints of a contact
 public abstract class Contact {
@@ -13,7 +18,8 @@ public abstract class Contact {
     private String name;
     private final List<PhoneNumber> phoneNumbers;
     private final List<EmailAddress> emailAddresses;
-    private final List<String> tags; 
+    private final Set<Tag> tags;
+    private final Set<PredefinedTag> predefinedTags;
     private int contactCount = 0;	
 
     public Contact(String name) {
@@ -22,7 +28,8 @@ public abstract class Contact {
         this.name = name;
         this.phoneNumbers = new ArrayList<>();
         this.emailAddresses = new ArrayList<>();
-        this.tags = new ArrayList<>();
+        this.tags = new HashSet<>();
+        this.predefinedTags = new HashSet<>();
     }
     
     protected Contact(Contact other) {
@@ -33,7 +40,8 @@ public abstract class Contact {
         // Deep copy
         this.phoneNumbers = new ArrayList<>(other.phoneNumbers);
         this.emailAddresses = new ArrayList<>(other.emailAddresses);
-        this.tags = new ArrayList<>(other.tags);
+        this.tags = new HashSet<>(other.tags);
+        this.predefinedTags = EnumSet.copyOf(other.predefinedTags);
     }
 
     public UUID getId() {
@@ -81,19 +89,30 @@ public abstract class Contact {
         this.emailAddresses.addAll(emails);
     }
     
-    public void addTag(String tag) {
-        if (tag == null || tag.isBlank()) {
-            throw new IllegalArgumentException("Tag cannot be empty");
-        }
+    // Custom Tags
+    public void addTag(Tag tag) {
         tags.add(tag);
     }
 
-    public void removeTag(String tag) {
+    public void removeTag(Tag tag) {
         tags.remove(tag);
     }
 
-    public List<String> getTags() {
-        return new ArrayList<>(tags); // defensive copy
+    public Set<Tag> getTags() {
+        return new HashSet<>(tags);
+    }
+
+    // Predefined Tags
+    public void addPredefinedTag(PredefinedTag tag) {
+        predefinedTags.add(tag);
+    }
+
+    public void removePredefinedTag(PredefinedTag tag) {
+        predefinedTags.remove(tag);
+    }
+
+    public Set<PredefinedTag> getPredefinedTags() {
+        return EnumSet.copyOf(predefinedTags);
     }
     
     public void incrementContactCount() {
@@ -118,7 +137,8 @@ public abstract class Contact {
                 Email Addresses: %s
                 Created At: %s
                 Tags: %s
+                Predefined Tags: %s
                 ==============================
-                """.formatted(getContactType(),name,phoneNumbers,emailAddresses,createdAt,tags);
+                """.formatted(getContactType(),name,phoneNumbers,emailAddresses,createdAt,tags,predefinedTags);
     }
 }
