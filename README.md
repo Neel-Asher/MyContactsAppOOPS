@@ -1,9 +1,7 @@
 # MyContactsAppOOPS
 MyContacts App is a Java-based, console-driven application implemented use-case wise to demonstrate object-oriented design, design patterns, and core Java concepts through a contact management system.
 
-## UC-11: Create and Manage Tags
-
-Actor: Logged-in User
+## UC-11: Create and Manage Tags - 01.03.2026
 
 + User creates custom tags to organize contacts
 + Predefined tags supported using PredefinedTag enum
