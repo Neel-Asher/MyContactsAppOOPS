@@ -12,4 +12,4 @@ MyContacts App is a Java-based, console-driven application implemented use-case 
 + Phone and email lists are replaced using defensive copying.
 + Repository update() method replaces the old contact with the modified version
 + Prevents shallow copy issues and unintended shared references.
-+ Ensures safe, controlled mutation of contact data following OOP principles.=
++ Ensures safe, controlled mutation of contact data following OOP principles.
